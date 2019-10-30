@@ -24,8 +24,9 @@ fmod EXPR is
     subsort Bool < Expr .
 
     op _+_ : Expr Expr -> Expr [ditto] .
+    op not_ : Expr -> Expr [ditto] .
     op _and_ : Expr Expr -> Expr [ditto] .
-    op _=:=_ : Expr Expr -> Bool [prec 25] .
+    op _=:=_ : Expr Expr -> Expr [prec 25] .
 endfm
 
 fmod SYMEXPR is
@@ -43,6 +44,7 @@ fmod SYMEXPR is
     op bool _ : Bool -> SymBool [ctor] .
 
     op _+_ : SymInt SymInt -> SymInt [prec 20 assoc comm] .
+    op not_ : SymBool -> SymBool .
     op _and_ : SymBool SymBool -> SymBool [prec 20 assoc comm] .
     op _=:=_ : SymExpr SymExpr -> SymBool [prec 25] .
 endfm
@@ -81,9 +83,30 @@ view Thread from TRIV to THREAD is
 endv
 
 fmod SYMPATH is
-    sort SymPath .
+    including EXPR .
+    including SYMEXPR .
+    including THREAD .
+    including SET{Var} .
+
+    sorts Vars Event SymPath .
+
+    subsort Event < SymPath .
+    subsort Set{Var} < Vars .
+
     op epsilon : -> SymPath [ctor] .
     op _._ : SymPath SymPath -> SymPath [ctor assoc id: epsilon] .
+    op _(_,_,_) : ThreadId SymExpr Vars Vars -> Event [ctor] .
+
+    var V : Var .
+    vars E1 E2 : Expr .
+
+    op vars : Expr -> Vars .
+    eq vars(V) = V .
+    eq vars(E1 + E2) = vars(E1), vars(E2) .
+    eq vars(not(E1)) = vars(E1) .
+    eq vars(E1 and E2) = vars(E1), vars(E2) .
+    eq vars(E1 =:= E2) = vars(E1), vars(E2) .
+    eq vars(E1) = empty [owise] .
 endfm
 
 fmod EVAL is
@@ -106,6 +129,7 @@ fmod EVAL is
     eq eval(M, B) = bool B .
     eq eval(M, V) = M[V] .
     eq eval(M, E1 + E2) = eval(M, E1) + eval(M, E2) .
+    eq eval(M, not(E1)) = not(eval(M, E1)) .
     eq eval(M, E1 and E2) = eval(M, E1) and eval(M, E2) .
     eq eval(M, E1 =:= E2) = eval(M, E1) =:= eval(M, E2) .
 endfm
@@ -132,6 +156,7 @@ mod SEMANTICS is
     vars Sigma Sigma' : Substitution .
     vars V : Var .
     vars E : Expr .
+    vars Ev1 Ev2 : Event .
     vars Se : SymExpr .
     vars P P' : Pool .
     vars NP : NePool .
@@ -156,12 +181,13 @@ mod SEMANTICS is
       =>
         schedules(NP, (| idle, Sigma, Sp, NP |)) .
 
-    --- TODO: Fix sympath
-    rl [Cond] :
+    crl [Cond] :
         (| < I | if (E) { Ss } else { Ss' } ; Ss'' >, Sigma, Sp, P |)
         =>
-          (| idle, Sigma, Sp, (P, < I | Ss ; Ss'' > ) |)
-          (| idle, Sigma, Sp, (P, < I | Ss' ; Ss'' > ) |) .
+          (| idle, Sigma, Ev1 . Sp, (P, < I | Ss ; Ss'' > ) |)
+          (| idle, Sigma, Ev2 . Sp, (P, < I | Ss' ; Ss'' > ) |)
+        if Ev1 := I (eval(Sigma, E), empty, vars(E)) /\
+           Ev2 := I (eval(Sigma, not(E)), empty, vars(E)) .
 
     rl [Termination] :
         (| < I | skip >, Sigma, Sp, P |)

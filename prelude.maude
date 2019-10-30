@@ -1425,36 +1425,37 @@ fmod SET*{X :: TRIV} is
 endfm
 
 fmod MAP{X :: TRIV, Y :: TRIV} is
-  protecting BOOL .
-  sorts Entry{X,Y} Map{X,Y} .
-  subsort Entry{X,Y} < Map{X,Y} .
+    protecting BOOL .
+    sorts Entry{X,Y} Map{X,Y} .
+    subsort Entry{X,Y} < Map{X,Y} .
 
-  op _|->_ : X$Elt Y$Elt -> Entry{X,Y} [ctor] .
-  op empty : -> Map{X,Y} [ctor] .
-  op _,_ : Map{X,Y} Map{X,Y} -> Map{X,Y} [ctor assoc comm id: empty prec 121 format (d r os d)] .
-  op undefined : -> [Y$Elt] [ctor] .
+    op _|->_ : X$Elt Y$Elt -> Entry{X,Y} [ctor] .
+    op empty : -> Map{X,Y} [ctor] .
+    op _,_ : Map{X,Y} Map{X,Y} -> Map{X,Y}
+        [ctor assoc comm id: empty prec 121 format (d r onttssss d)] .
+    op undefined : -> [Y$Elt] [ctor] .
 
-  var D : X$Elt .
-  vars R R' : Y$Elt .
-  var M : Map{X,Y} .
+    var D : X$Elt .
+    vars R R' : Y$Elt .
+    var M : Map{X,Y} .
 
-  op insert : X$Elt Y$Elt Map{X,Y} -> Map{X,Y} .
-  eq insert(D, R, (M, D |-> R')) =
-     if $hasMapping(M, D) then insert(D, R, M)
-     else (M, D |-> R)
-     fi .
-  eq insert(D, R, M) = (M, D |-> R) [owise] .
+    op insert : X$Elt Y$Elt Map{X,Y} -> Map{X,Y} .
+    eq insert(D, R, (M, D |-> R')) =
+      if $hasMapping(M, D) then insert(D, R, M)
+        else (M, D |-> R)
+        fi .
+    eq insert(D, R, M) = (M, D |-> R) [owise] .
 
-  op _[_] : Map{X,Y} X$Elt -> [Y$Elt] [prec 23] .
-  eq (M, D |-> R)[D] =
-     if $hasMapping(M, D) then undefined
-     else R
-     fi .
-  eq M[D] = undefined [owise] .
+    op _[_] : Map{X,Y} X$Elt -> [Y$Elt] [prec 23] .
+    eq (M, D |-> R)[D] =
+      if $hasMapping(M, D) then undefined
+        else R
+        fi .
+    eq M[D] = undefined [owise] .
 
-  op $hasMapping : Map{X,Y} X$Elt -> Bool .
-  eq $hasMapping((M, D |-> R), D) = true .
-  eq $hasMapping(M, D) = false [owise] .
+    op $hasMapping : Map{X,Y} X$Elt -> Bool .
+    eq $hasMapping((M, D |-> R), D) = true .
+    eq $hasMapping(M, D) = false [owise] .
 endfm
 
 fmod ARRAY{X :: TRIV, Y :: DEFAULT} is
@@ -2490,17 +2491,20 @@ mod LOOP-MODE is
 endm
 
 mod CONFIGURATION is
-  sorts Attribute AttributeSet .
-  subsort Attribute < AttributeSet .
-  op none : -> AttributeSet  [ctor] .
-  op _,_ : AttributeSet AttributeSet -> AttributeSet [ctor assoc comm id: none] .
+    sorts Attribute AttributeSet .
+    subsort Attribute < AttributeSet .
+    op none : -> AttributeSet  [ctor] .
+    op _,_ : AttributeSet AttributeSet -> AttributeSet
+        [ctor assoc comm id: none format (d d ntsss d)] .
 
-  sorts Oid Cid Object Msg Portal Configuration .
-  subsort Object Msg Portal < Configuration .
-  op <_:_|_> : Oid Cid AttributeSet -> Object [ctor object] .
-  op none : -> Configuration [ctor] .
-  op __ : Configuration Configuration -> Configuration [ctor config assoc comm id: none] .
-  op <> : -> Portal [ctor] .
+    --- Removed Msg
+    sorts Oid Cid Object Portal Configuration .
+    subsort Object Portal < Configuration .
+    op <_:_|_> : Oid Cid AttributeSet -> Object [ctor object] .
+    op none : -> Configuration [ctor] .
+    op __ : Configuration Configuration -> Configuration
+        [ctor config assoc comm id: none format (n n d)] .
+    op <> : -> Portal [ctor] .
 endm
 
 set include BOOL on .

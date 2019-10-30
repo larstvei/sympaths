@@ -44,7 +44,7 @@ fmod STATEMENTS is
     op _:=_ : Var SymExpr -> Statement [ctor] .
     op skip : -> Statement [ctor] .
     op if (_) { _ } else { _ } : SymBool Statements Statements -> Statement [ctor] .
-    op _;_ : Statements Statements -> Statements [ctor assoc prec 100] .
+    op _;_ : Statements Statements -> Statements [ctor assoc id: skip prec 100] .
 endfm
 
 fmod THREAD is

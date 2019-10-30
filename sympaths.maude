@@ -113,8 +113,9 @@ fmod SYMBOLIC-STATE is
     including SYMPATH .
     including SET{Thread} .
 
-    sorts SymbolicState Pool .
+    sorts SymbolicState Pool NePool .
     subsort Set{Thread} < Pool .
+    subsort NeSet{Thread} < NePool .
 
     op (|_,_,_,_|) : Thread Substitution SymPath Pool -> SymbolicState [ctor] .
 endfm
@@ -130,7 +131,8 @@ mod SEMANTICS is
     vars E : Expr .
     vars Se : SymExpr .
     vars P P' : Pool .
-    vars Ss Ss' : Statements .
+    vars NP : NePool .
+    vars Ss Ss' Ss'' : Statements .
     vars T T' : Thread .
     vars I I' : ThreadId .
     vars Sp Sp' : SymPath .
@@ -147,9 +149,16 @@ mod SEMANTICS is
       if Se := eval(Sigma, E) .
 
     rl [Schedule] :
-        (| idle, Sigma, Sp, P |)
+        (| idle, Sigma, Sp, NP |)
       =>
-        schedules(P, (| idle, Sigma, Sp, P |)) .
+        schedules(NP, (| idle, Sigma, Sp, NP |)) .
+
+    --- TODO: Fix sympath
+    rl [Cond] :
+        (| < I | if (E) { Ss } else { Ss' } ; Ss'' >, Sigma, Sp, P |)
+        =>
+          (| idle, Sigma, Sp, (P, < I | Ss ; Ss'' > ) |)
+          (| idle, Sigma, Sp, (P, < I | Ss' ; Ss'' > ) |) .
 
     rl [Termination] :
         (| < I | skip >, Sigma, Sp, P |)

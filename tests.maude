@@ -20,3 +20,4 @@ endm
 rew (| < I | 'x := 'y >, sigma, Sp, empty |) .
 rew (| < I | skip >, Sigma, Sp, < I' | skip > |) .
 rew (| idle, Sigma, Sp, (< 0 | skip >, < 1 | skip >, < 2 | skip >) |) .
+rew (| < I | if ('x =:= 1) { 'x := 2 } else { 'x := 'y } >, sigma, Sp, empty |) .

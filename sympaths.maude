@@ -108,23 +108,23 @@ fmod EVAL is
     eq eval(M, E1 =:= E2) = eval(M, E1) =:= eval(M, E2) .
 endfm
 
-fmod SYMBOLIC-STATE is
+fmod SEARCH-STATE is
     including EVAL .
     including SYMPATH .
     including SET{Thread} .
 
-    sorts SymbolicState Pool NePool .
+    sorts SearchState Pool NePool .
     subsort Set{Thread} < Pool .
     subsort NeSet{Thread} < NePool .
 
-    op (|_,_,_,_|) : Thread Substitution SymPath Pool -> SymbolicState [ctor] .
+    op (|_,_,_,_|) : Thread Substitution SymPath Pool -> SearchState [ctor] .
 endfm
 
 mod SEMANTICS is
     including CONFIGURATION .
-    including SYMBOLIC-STATE .
+    including SEARCH-STATE .
 
-    subsort SymbolicState < Configuration .
+    subsort SearchState < Configuration .
 
     vars Sigma Sigma' : Substitution .
     vars V : Var .
@@ -137,7 +137,7 @@ mod SEMANTICS is
     vars I I' : ThreadId .
     vars Sp Sp' : SymPath .
 
-    op schedules : Pool SymbolicState -> Configuration .
+    op schedules : Pool SearchState -> Configuration .
     eq schedules(empty, (| idle, Sigma, Sp, P' |)) = none .
     eq schedules((T, P), (| idle, Sigma, Sp, P' |)) =
         (| T, Sigma, Sp, P' \ T |) schedules(P, (| idle, Sigma, Sp, P' |)) [owise] .

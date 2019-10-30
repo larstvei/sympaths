@@ -79,17 +79,37 @@ fmod SYMPATH is
     op epsilon : -> SymPath [ctor] .
     op _._ : SymPath SymPath -> SymPath [ctor assoc id: epsilon] .
 endfm
-    
+
+fmod EVAL is
+    including VAR .
+    including EXPR .
+    including SYMEXPR .
+    including MAP{Var, SymExpr} .
+
+    sort Substitution .
+    subsort Map{Var, SymExpr} < Substitution .
+
+    var M : Substitution .
+    var N : Int .
+    var B : Bool .
+    var V : Var .
+    vars E1 E2 : Expr .
+
+    op eval : Substitution Expr -> SymExpr .
+    eq eval(M, N) = int N .
+    eq eval(M, B) = bool B .
+    eq eval(M, V) = M[V] .
+    eq eval(M, E1 + E2) = eval(M, E1) + eval(M, E2) .
+    eq eval(M, E1 and E2) = eval(M, E1) and eval(M, E2) .
+    eq eval(M, E1 =:= E2) = eval(M, E1) =:= eval(M, E2) .
+endfm
 
 fmod SYMBOLIC-STATE is
-    including VAR .
+    including EVAL .
     including SYMPATH .
-    including SYMEXPR .
     including SET{Thread} .
-    including MAP{Var, SymExpr} .
-    
-    sorts SymbolicState Pool Substitution .
-    subsort Map{Var, SymExpr} < Substitution .
+
+    sorts SymbolicState Pool .
     subsort Set{Thread} < Pool .
 
     op (|_,_,_,_|) : Thread Pool Substitution SymPath -> SymbolicState [ctor] .

@@ -1,0 +1,21 @@
+load sympaths.maude
+
+mod TEST is
+    including SEMANTICS .
+
+    vars Sigma Sigma' : Substitution .
+    vars V : Var .
+    vars E : Expr .
+    vars Se : SymExpr .
+    vars P P' : Pool .
+    vars Ss Ss' : Statements .
+    vars T T' : Thread .
+    vars I I' : ThreadId .
+    vars Sp Sp' : SymPath .
+
+    op sigma : -> Substitution .
+    eq sigma = 'x |-> (x(0) + int(3)), 'y |-> (x(0) + x(1) + int(4)), 'b |-> bool true .
+endm
+
+rew (| < I | 'x := 'y >, sigma, Sp, P |) .
+rew (| < I | skip >, Sigma, Sp, P |) .

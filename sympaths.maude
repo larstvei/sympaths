@@ -11,6 +11,21 @@ view Var from TRIV to VAR is
     sort Elt to Var .
 endv
 
+fmod EXPR is
+    pr VAR .
+    pr INT .
+    pr BOOL .
+
+    sorts Expr .
+    subsort Var < Expr .
+    subsort Int < Expr .
+    subsort Bool < Expr .
+
+    op _+_ : Expr Expr -> Expr [ditto] .
+    op _and_ : Expr Expr -> Expr [ditto] .
+    op _=:=_ : Expr Expr -> Bool [prec 25] .
+endfm
+
 fmod SYMEXPR is
     pr INT .
     pr BOOL .
@@ -25,9 +40,9 @@ fmod SYMEXPR is
     op int _ : Int -> SymInt [ctor] .
     op bool _ : Bool -> SymBool [ctor] .
 
-    op _+_ : SymInt SymInt -> SymInt [prec 20] .
-    op _and_ : SymBool SymBool -> SymBool [prec 20] .
-    op _==_ : SymExpr SymExpr -> SymBool [prec 25] .
+    op _+_ : SymInt SymInt -> SymInt [prec 20 assoc comm] .
+    op _and_ : SymBool SymBool -> SymBool [prec 20 assoc comm] .
+    op _=:=_ : SymExpr SymExpr -> SymBool [prec 25] .
 endfm
 
 view SymExpr from TRIV to SYMEXPR is
@@ -36,14 +51,14 @@ endv
 
 fmod STATEMENTS is
     including VAR .
-    including SYMEXPR .
+    including EXPR .
 
     sorts Statement Statements .
     subsort Statement < Statements .
 
-    op _:=_ : Var SymExpr -> Statement [ctor] .
+    op _:=_ : Var Expr -> Statement [ctor] .
     op skip : -> Statement [ctor] .
-    op if (_) { _ } else { _ } : SymBool Statements Statements -> Statement [ctor] .
+    op if (_) { _ } else { _ } : Expr Statements Statements -> Statement [ctor] .
     op _;_ : Statements Statements -> Statements [ctor assoc id: skip prec 100] .
 endfm
 

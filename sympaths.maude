@@ -63,11 +63,15 @@ fmod STATEMENTS is
 endfm
 
 fmod THREAD is
+    including NAT .
     including STATEMENTS .
+
     sort Thread .
+    sort ThreadId .
+    subsort ThreadId < Nat .
 
     op idle : -> Thread [ctor] .
-    op <_|_> : Nat Statements -> Thread [ctor] .
+    op <_|_> : ThreadId Statements -> Thread [ctor] .
 endfm
 
 view Thread from TRIV to THREAD is

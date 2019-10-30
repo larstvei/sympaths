@@ -50,6 +50,8 @@ endfm
 fmod THREAD is
     including STATEMENTS .
     sort Thread .
+
+    op idle : -> Thread [ctor] .
     op <_|_> : Nat Statements -> Thread [ctor] .
 endfm
 

@@ -112,11 +112,16 @@ fmod SYMBOLIC-STATE is
     including EVAL .
     including SYMPATH .
     including SET{Thread} .
-    including CONFIGURATION .
 
     sorts SymbolicState Pool .
     subsort Set{Thread} < Pool .
-    subsort SymbolicState < Configuration .
 
-    op (|_,_,_,_|) : Thread Pool Substitution SymPath -> SymbolicState [ctor] .
+    op (|_,_,_,_|) : Thread Substitution SymPath Pool -> SymbolicState [ctor] .
 endfm
+
+mod SEMANTICS is
+    including CONFIGURATION .
+    including SYMBOLIC-STATE .
+
+    subsort SymbolicState < Configuration .
+endm

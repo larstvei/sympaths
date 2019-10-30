@@ -1432,7 +1432,7 @@ fmod MAP{X :: TRIV, Y :: TRIV} is
     op _|->_ : X$Elt Y$Elt -> Entry{X,Y} [ctor] .
     op empty : -> Map{X,Y} [ctor] .
     op _,_ : Map{X,Y} Map{X,Y} -> Map{X,Y}
-        [ctor assoc comm id: empty prec 121 format (d r onttssss d)] .
+        [ctor assoc comm id: empty prec 121 format (r d nss o)] .
     op undefined : -> [Y$Elt] [ctor] .
 
     var D : X$Elt .
@@ -2502,8 +2502,7 @@ mod CONFIGURATION is
     subsort Object Portal < Configuration .
     op <_:_|_> : Oid Cid AttributeSet -> Object [ctor object] .
     op none : -> Configuration [ctor] .
-    op __ : Configuration Configuration -> Configuration
-        [ctor config assoc comm id: none format (n n d)] .
+    op __ : Configuration Configuration -> Configuration [ctor config assoc comm id: none] .
     op <> : -> Portal [ctor] .
 endm
 

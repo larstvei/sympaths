@@ -1,4 +1,6 @@
 ---  -*- maude-command-options: ("-no-wrap" "-ansi-color" "-no-prelude") -*- 
+set show advisories off .
+
 load prelude.maude
 
 fmod VAR is
@@ -117,7 +119,8 @@ fmod SEARCH-STATE is
     subsort Set{Thread} < Pool .
     subsort NeSet{Thread} < NePool .
 
-    op (|_,_,_,_|) : Thread Substitution SymPath Pool -> SearchState [ctor] .
+    op (|_,_,_,_|) : Thread Substitution SymPath Pool -> SearchState
+        [ctor format (n d n s n s n s d n)] .
 endfm
 
 mod SEMANTICS is

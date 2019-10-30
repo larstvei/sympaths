@@ -68,7 +68,7 @@ fmod THREAD is
 
     sort Thread .
     sort ThreadId .
-    subsort ThreadId < Nat .
+    subsort Nat < ThreadId .
 
     op idle : -> Thread [ctor] .
     op <_|_> : ThreadId Statements -> Thread [ctor] .

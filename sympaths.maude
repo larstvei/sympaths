@@ -135,11 +135,21 @@ mod SEMANTICS is
     vars I I' : ThreadId .
     vars Sp Sp' : SymPath .
 
+    op schedules : Pool SymbolicState -> Configuration .
+    eq schedules(empty, (| idle, Sigma, Sp, P' |)) = none .
+    eq schedules((T, P), (| idle, Sigma, Sp, P' |)) =
+        (| T, Sigma, Sp, P' \ T |) schedules(P, (| idle, Sigma, Sp, P' |)) [owise] .
+
     crl [Assignment] :
         (| < I | V := E ; Ss >, Sigma, Sp, P |)
     =>
         (| idle, insert(V, Se, Sigma), Sp, (P, < I | Ss >) |)
       if Se := eval(Sigma, E) .
+
+    rl [Schedule] :
+        (| idle, Sigma, Sp, P |)
+      =>
+        schedules(P, (| idle, Sigma, Sp, P |)) .
 
     rl [Termination] :
         (| < I | skip >, Sigma, Sp, P |)

@@ -17,7 +17,7 @@ mod TEST is
     eq sigma = 'x |-> (x(0) + int(3)), 'y |-> (x(0) + x(1) + int(4)), 'b |-> bool true .
 endm
 
-rew (| < I | 'x := 'y >, sigma, Sp, empty |) .
-rew (| < I | skip >, Sigma, Sp, < I' | skip > |) .
-rew (| idle, Sigma, Sp, (< 0 | skip >, < 1 | skip >, < 2 | skip >) |) .
-rew (| < I | if ('x =:= 1) { 'x := 2 } else { 'x := 'y } >, sigma, Sp, empty |) .
+rew (| < I | 'x := 'y >, sigma, epsilon, empty |) .
+rew (| < I | skip >, Sigma, epsilon, < I' | skip > |) .
+rew (| idle, Sigma, epsilon, (< 0 | skip >, < 1 | skip >, < 2 | skip >) |) .
+rew (| < I | if ('x =:= 1) { 'x := 2 } else { 'x := 'y } >, sigma, epsilon, empty |) .

@@ -184,8 +184,8 @@ mod SEMANTICS is
     crl [Cond] :
         (| < I | if (E) { Ss } else { Ss' } ; Ss'' >, Sigma, Sp, P |)
         =>
-          (| idle, Sigma, Ev1 . Sp, (P, < I | Ss ; Ss'' > ) |)
-          (| idle, Sigma, Ev2 . Sp, (P, < I | Ss' ; Ss'' > ) |)
+          (| idle, Sigma, Sp . Ev1, (P, < I | Ss ; Ss'' > ) |)
+          (| idle, Sigma, Sp . Ev2, (P, < I | Ss' ; Ss'' > ) |)
         if Ev1 := I (eval(Sigma, E), empty, vars(E)) /\
            Ev2 := I (eval(Sigma, not(E)), empty, vars(E)) .
 

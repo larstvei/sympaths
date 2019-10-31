@@ -1,4 +1,4 @@
----  -*- maude-command-options: ("-no-wrap" "-ansi-color" "-no-prelude") -*- 
+---  -*- maude-command-options: ("-no-wrap" "-ansi-color" "-no-prelude") -*-
 set show advisories off .
 
 load prelude.maude
@@ -8,7 +8,7 @@ fmod VAR is
     sort Var .
     subsort Qid < Var .
 endfm
-    
+
 view Var from TRIV to VAR is
     sort Elt to Var .
 endv
@@ -107,6 +107,30 @@ fmod SYMPATH is
     eq vars(E1 and E2) = vars(E1), vars(E2) .
     eq vars(E1 =:= E2) = vars(E1), vars(E2) .
     eq vars(E1) = empty [owise] .
+
+    --- Canonicalization of sympath
+    vars Ev1 Ev2 : Event .
+    vars Sp1 Sp2 : SymPath .
+
+    ceq Sp1 . Ev1 . Ev2 . Sp2 = Sp1 . Ev2 . Ev1 . Sp2
+      if swapable(Ev1, Ev2) /\ prec(Ev2, Ev1) .
+
+    vars I I' : ThreadId .
+    vars Se Se' : SymExpr .
+    vars R R' W W' : Vars .
+
+    op swapable : Event Event -> Bool .
+    eq swapable(I (Se, W, R), I' (Se', W', R')) =
+        I =/= I'
+        and intersection(W, union(R', W')) == empty
+        and intersection(W', union(R, W)) == empty .
+
+    op prec : Event Event -> Bool .
+    eq prec(I (Se, W, R), I' (Se', W', R')) = I < I' .
+
+    op prefix : SymPath SymPath -> Bool .
+    eq prefix(Sp1, Sp1 . Sp2) = true .
+    eq prefix(Sp1, Sp2) = false [owise] .
 endfm
 
 fmod EVAL is
@@ -159,7 +183,7 @@ mod SEMANTICS is
     vars Ev1 Ev2 : Event .
     vars Se : SymExpr .
     vars P P' : Pool .
-    vars NP : NePool .
+    vars NP NP' : NePool .
     vars Ss Ss' Ss'' : Statements .
     vars T T' : Thread .
     vars I I' : ThreadId .
@@ -172,7 +196,7 @@ mod SEMANTICS is
 
     crl [Assignment] :
         (| < I | V := E ; Ss >, Sigma, Sp, P |)
-    =>
+      =>
         (| idle, insert(V, Se, Sigma), Sp . Ev1, (P, < I | Ss >) |)
       if Se := eval(Sigma, E) /\
          Ev1 := I (bool true, V, vars(E)) .
@@ -194,4 +218,11 @@ mod SEMANTICS is
         (| < I | skip >, Sigma, Sp, P |)
       =>
         (| idle, Sigma, Sp, P |) .
+
+    ceq [Prune] :
+        (| idle, Sigma, Sp, P |)
+        (| idle, Sigma', Sp', P' |)
+      =
+        (| idle, Sigma, Sp, P |)
+      if prefix(Sp', Sp) .
 endm

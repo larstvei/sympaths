@@ -6,9 +6,11 @@ mod TEST is
     vars Sigma Sigma' : Substitution .
     vars V : Var .
     vars E : Expr .
+    vars Ev1 Ev2 : Event .
     vars Se : SymExpr .
     vars P P' : Pool .
-    vars Ss Ss' : Statements .
+    vars NP NP' : NePool .
+    vars Ss Ss' Ss'' : Statements .
     vars T T' : Thread .
     vars I I' : ThreadId .
     vars Sp Sp' : SymPath .
@@ -21,3 +23,12 @@ rew (| < I | 'x := 'y >, sigma, epsilon, empty |) .
 rew (| < I | skip >, Sigma, epsilon, < I' | skip > |) .
 rew (| idle, Sigma, epsilon, (< 0 | skip >, < 1 | skip >, < 2 | skip >) |) .
 rew (| < I | if ('x =:= 1) { 'x := 2 } else { 'x := 'y } >, sigma, epsilon, empty |) .
+
+rew
+(| idle
+,  ('x |-> x(0), 'y |-> x(1), 'z |-> x(2))
+,  epsilon
+,  (< 0 | 'y := 'x >,
+    < 1 | 'z := 'x >,
+    < 2 | 'x := 2 > )
+|) .

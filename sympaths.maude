@@ -173,8 +173,9 @@ mod SEMANTICS is
     crl [Assignment] :
         (| < I | V := E ; Ss >, Sigma, Sp, P |)
     =>
-        (| idle, insert(V, Se, Sigma), Sp, (P, < I | Ss >) |)
-      if Se := eval(Sigma, E) .
+        (| idle, insert(V, Se, Sigma), Sp . Ev1, (P, < I | Ss >) |)
+      if Se := eval(Sigma, E) /\
+         Ev1 := I (bool true, V, vars(E)) .
 
     rl [Schedule] :
         (| idle, Sigma, Sp, NP |)

@@ -217,10 +217,7 @@ mod SEMANTICS is
         if Ev1 := I (eval(Sigma, E), empty, vars(E)) /\
            Ev2 := I (eval(Sigma, not(E)), empty, vars(E)) .
 
-    rl [Termination] :
-        (| < I | skip >, Sigma, Sp, P |)
-      =>
-        (| idle, Sigma, Sp, P |) .
+    eq [Termination] : (P, < I | skip >) = P .
 
     ceq [POR] :
         (| idle, Sigma, Sp, P |)

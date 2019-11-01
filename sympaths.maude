@@ -1,4 +1,3 @@
----  -*- maude-command-options: ("-no-wrap" "-ansi-color" "-no-prelude") -*-
 set show advisories off .
 
 load prelude.maude

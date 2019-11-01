@@ -112,18 +112,21 @@ fmod SYMPATH is
     vars Ev1 Ev2 : Event .
     vars Sp1 Sp2 : SymPath .
 
-    ceq Sp1 . Ev1 . Ev2 . Sp2 = Sp1 . Ev2 . Ev1 . Sp2
-      if swapable(Ev1, Ev2) /\ prec(Ev2, Ev1) .
+    op canonical : SymPath -> SymPath .
+    ceq canonical(Sp1 . Ev1 . Ev2 . Sp2) = canonical(Sp1 . Ev2 . Ev1 . Sp2)
+      if permutable(Ev1, Ev2) /\ prec(Ev2, Ev1) .
+    eq canonical(Sp1) = Sp1 [owise] .
 
     vars I I' : ThreadId .
     vars Se Se' : SymExpr .
     vars R R' W W' : Vars .
 
-    op swapable : Event Event -> Bool .
-    eq swapable(I (Se, W, R), I' (Se', W', R')) =
+    op permutable : Event Event -> Bool .
+    eq permutable(I (Se, W, R), I' (Se', W', R')) =
         I =/= I'
-        and intersection(W, union(R', W')) == empty
-        and intersection(W', union(R, W)) == empty .
+        --- Can we omit the write sets?
+        and intersection(W, union(W', R')) == empty
+        and intersection(W', union(W, R)) == empty .
 
     op prec : Event Event -> Bool .
     eq prec(I (Se, W, R), I' (Se', W', R')) = I < I' .
@@ -219,10 +222,10 @@ mod SEMANTICS is
       =>
         (| idle, Sigma, Sp, P |) .
 
-    ceq [Prune] :
+    ceq [POR] :
         (| idle, Sigma, Sp, P |)
         (| idle, Sigma', Sp', P' |)
       =
         (| idle, Sigma, Sp, P |)
-      if prefix(Sp', Sp) .
+      if prefix(canonical(Sp'), canonical(Sp)) .
 endm

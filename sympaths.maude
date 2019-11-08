@@ -38,7 +38,7 @@ fmod SYMEXPR is
     subsorts SymInt SymBool < SymExpr .
 
     op x(_): Nat -> LInt [ctor] .
-    op b(_): Bool -> LBool [ctor] .
+    op b(_): Nat -> LBool [ctor] .
     op int _ : Int -> SymInt [ctor] .
     op bool _ : Bool -> SymBool [ctor] .
 

@@ -1,0 +1,71 @@
+load sympaths.maude
+
+fmod DYNAMIC-STATE is
+    including SEARCH-STATE .
+
+    sorts Precondition Antecedent Postcondition Consequent ProofObligation Reduced .
+
+    op _,_ : Precondition SymPath -> Antecedent [ctor] .
+    op __ : Substitution Postcondition -> Consequent [ctor] .
+    op _[_,_]_ : Substitution Thread Pool Postcondition -> Consequent [ctor] .
+    op _ ==> _ : Antecedent Consequent -> ProofObligation [ctor] .
+    op |-_ : ProofObligation -> Reduced .
+
+    op Gamma : -> Precondition [ctor] .
+    op Psy : -> Postcondition [ctor] .
+endfm
+
+mod DYNAMIC-PROVER is
+    including CONFIGURATION .
+    including DYNAMIC-STATE .
+
+    subsort ProofObligation Reduced < Configuration .
+
+    vars Sigma Sigma' : Substitution .
+    vars V : Var .
+    vars E : Expr .
+    vars Ev1 Ev2 : Event .
+    vars Se : SymExpr .
+    vars P P' : Pool .
+    vars NP NP' : NePool .
+    vars Ss Ss' Ss'' : Statements .
+    vars T T' : Thread .
+    vars I I' : ThreadId .
+    vars Sp Sp' : SymPath .
+
+    op schedules : Pool ProofObligation -> Configuration .
+    eq schedules(empty, (Gamma, Sp ==> Sigma [ idle, P' ] Psy)) = none .
+    eq schedules((T, P), (Gamma, Sp ==> Sigma [ idle, P' ] Psy)) =
+        (Gamma, Sp ==> Sigma [ T, P' \ T ] Psy)
+        schedules(P, (Gamma, Sp ==> Sigma [ idle, P' ] Psy)) [owise] .
+
+    crl [DL-Assign] :
+        Gamma, Sp ==> Sigma [ < I | V := E ; Ss >, P ] Psy
+      =>
+        Gamma, Sp . Ev1 ==> insert(V, Se, Sigma) [ idle , (P, < I | Ss >) ] Psy
+      if Se := eval(Sigma, E) /\
+         Ev1 := I (bool true, V, vars(E)) .
+
+    crl [Cond] :
+        Gamma, Sp ==> Sigma [ < I | if (E) { Ss } else { Ss' } ; Ss'' >, P] Psy
+        =>
+          (Gamma, Sp . Ev1 ==> Sigma [ idle, (P, < I | Ss ; Ss'' >)] Psy)
+          (Gamma, Sp . Ev2 ==> Sigma [ idle, (P, < I | Ss' ; Ss'' >)] Psy)
+        if Ev1 := I (eval(Sigma, E), empty, vars(E)) /\
+           Ev2 := I (eval(Sigma, not(E)), empty, vars(E)) .
+
+    rl [DL-Schedule] :
+        Gamma, Sp ==> Sigma [ idle, NP ] Psy
+      =>
+        schedules(NP, (Gamma, Sp ==> Sigma [ idle, NP ] Psy)) .
+
+    rl [DL-Termination] :
+        Gamma, Sp ==> Sigma [ < I | skip >, P ] Psy
+      =>
+        Gamma, Sp ==> Sigma [ idle, P ] Psy .
+
+    rl [DL-Reduce] :
+        Gamma, Sp ==> Sigma [ idle, empty ] Psy
+      =>
+        |- (Gamma, Sp ==> Sigma Psy) .
+endm

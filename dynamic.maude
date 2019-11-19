@@ -68,4 +68,12 @@ mod DYNAMIC-PROVER is
         Gamma, Sp ==> Sigma [ idle, empty ] Psy
       =>
         |- (Gamma, Sp ==> Sigma Psy) .
+
+    ceq [POR] :
+        (Gamma, Sp ==> Sigma [ T, P ] Psy)
+        (Gamma, Sp' ==> Sigma [ T, P ] Psy)
+      =
+        Gamma, Sp ==> Sigma [ T, P ] Psy
+      if prefix(canonical(Sp'), canonical(Sp)) .
+
 endm

@@ -1,7 +1,9 @@
 load sympaths.maude
+load dynamic.maude
 
 mod TEST is
     including SEMANTICS .
+    including DYNAMIC-PROVER .
 
     vars Sigma Sigma' : Substitution .
     vars V : Var .
@@ -32,3 +34,12 @@ rew
     < 1 | 'z := 'x >,
     < 2 | 'x := 2 > )
 |) .
+
+--- DL
+
+rew
+Gamma, epsilon ==>
+('x |-> x(0), 'y |-> x(1), 'z |-> x(2))
+[ idle, (< 0 | 'y := 'x >, < 1 | 'z := 'x >, < 2 | 'x := 2 > ) ]
+Psy
+.

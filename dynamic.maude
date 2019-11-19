@@ -8,8 +8,8 @@ fmod DYNAMIC-STATE is
     op _,_ : Precondition SymPath -> Antecedent [ctor] .
     op __ : Substitution Postcondition -> Consequent [ctor] .
     op _[_,_]_ : Substitution Thread Pool Postcondition -> Consequent [ctor] .
-    op _ ==> _ : Antecedent Consequent -> ProofObligation [ctor] .
-    op |-_ : ProofObligation -> Reduced .
+    op _ ==> _ : Antecedent Consequent -> ProofObligation [ctor format (n nss n n)] .
+    op |-_ : ProofObligation -> Reduced [ctor format (n s s)] .
 
     op Gamma : -> Precondition [ctor] .
     op Psy : -> Postcondition [ctor] .
@@ -69,11 +69,19 @@ mod DYNAMIC-PROVER is
       =>
         |- (Gamma, Sp ==> Sigma Psy) .
 
-    ceq [POR] :
-        (Gamma, Sp ==> Sigma [ T, P ] Psy)
-        (Gamma, Sp' ==> Sigma [ T, P ] Psy)
+    --- Two rules for POR, becuase we the reduced term does not match with a
+    --- ProofObligation.
+    ceq [DL-POR] :
+        (Gamma, Sp ==> Sigma [ idle, P ] Psy)
+        (Gamma, Sp' ==> Sigma [ idle, P ] Psy)
       =
-        Gamma, Sp ==> Sigma [ T, P ] Psy
+        Gamma, Sp ==> Sigma [ idle, P ] Psy
       if prefix(canonical(Sp'), canonical(Sp)) .
 
+    ceq [DL-POR] :
+        |- (Gamma, Sp ==> Sigma Psy)
+        (Gamma, Sp' ==> Sigma [ idle, P ] Psy)
+      =
+        Gamma, Sp ==> Sigma [ idle, P ] Psy
+      if prefix(canonical(Sp'), canonical(Sp)) .
 endm

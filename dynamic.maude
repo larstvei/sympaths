@@ -44,15 +44,15 @@ mod DYNAMIC-PROVER is
       =>
         Gamma, Sp . Ev1 ==> insert(V, Se, Sigma) [ idle , (P, < I | Ss >) ] Psy
       if Se := eval(Sigma, E) /\
-         Ev1 := I (bool true, V, vars(E)) .
+         Ev1 := I (bool true ~ V ~ vars(E)) .
 
     crl [Cond] :
         Gamma, Sp ==> Sigma [ < I | if (E) { Ss } else { Ss' } ; Ss'' >, P] Psy
         =>
           (Gamma, Sp . Ev1 ==> Sigma [ idle, (P, < I | Ss ; Ss'' >)] Psy)
           (Gamma, Sp . Ev2 ==> Sigma [ idle, (P, < I | Ss' ; Ss'' >)] Psy)
-        if Ev1 := I (eval(Sigma, E), empty, vars(E)) /\
-           Ev2 := I (eval(Sigma, not(E)), empty, vars(E)) .
+        if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
+           Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     rl [DL-Schedule] :
         Gamma, Sp ==> Sigma [ idle, NP ] Psy

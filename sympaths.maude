@@ -94,7 +94,7 @@ fmod SYMPATH is
 
     op epsilon : -> SymPath [ctor] .
     op _._ : SymPath SymPath -> SymPath [ctor assoc id: epsilon] .
-    op _(_,_,_) : ThreadId SymExpr Vars Vars -> Event [ctor] .
+    op _(_~_~_) : ThreadId SymExpr Vars Vars -> Event [ctor] .
 
     var V : Var .
     vars E1 E2 : Expr .
@@ -121,14 +121,14 @@ fmod SYMPATH is
     vars R R' W W' : Vars .
 
     op permutable : Event Event -> Bool .
-    eq permutable(I (Se, W, R), I' (Se', W', R')) =
+    eq permutable(I (Se ~ W ~ R), I' (Se' ~ W' ~ R')) =
         I =/= I'
         --- Can we omit the write sets?
         and intersection(W, union(W', R')) == empty
         and intersection(W', union(W, R)) == empty .
 
     op prec : Event Event -> Bool .
-    eq prec(I (Se, W, R), I' (Se', W', R')) = I < I' .
+    eq prec(I (Se ~ W ~ R), I' (Se' ~ W' ~ R')) = I < I' .
 
     op prefix : SymPath SymPath -> Bool .
     eq prefix(Sp1, Sp1 . Sp2) = true .
@@ -201,7 +201,7 @@ mod SEMANTICS is
       =>
         (| idle, insert(V, Se, Sigma), Sp . Ev1, (P, < I | Ss >) |)
       if Se := eval(Sigma, E) /\
-         Ev1 := I (bool true, V, vars(E)) .
+         Ev1 := I (bool true ~ V ~ vars(E)) .
 
     rl [Schedule] :
         (| idle, Sigma, Sp, NP |)
@@ -213,8 +213,8 @@ mod SEMANTICS is
         =>
           (| idle, Sigma, Sp . Ev1, (P, < I | Ss ; Ss'' > ) |)
           (| idle, Sigma, Sp . Ev2, (P, < I | Ss' ; Ss'' > ) |)
-        if Ev1 := I (eval(Sigma, E), empty, vars(E)) /\
-           Ev2 := I (eval(Sigma, not(E)), empty, vars(E)) .
+        if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
+           Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     eq [Termination] :
         (| T, Sigma, Sp, (P, < I | skip >) |)

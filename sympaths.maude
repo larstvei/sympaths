@@ -176,10 +176,14 @@ fmod SEARCH-STATE is
 endfm
 
 mod SEMANTICS is
+    including LIST{Nat} .
     including CONFIGURATION .
     including SEARCH-STATE .
 
-    subsort SearchState < Configuration .
+    sort Hist .
+    subsort SearchState Hist < Configuration .
+
+    op [_] : List{Nat} -> Hist .
 
     vars Sigma Sigma' : Substitution .
     vars B : Nat .
@@ -187,6 +191,8 @@ mod SEMANTICS is
     vars E : Expr .
     vars Ev1 Ev2 : Event .
     vars Se : SymExpr .
+    vars L : List{Nat} .
+    vars N : Int .
     vars P P' : Pool .
     vars NP NP' : NePool .
     vars Ss Ss' Ss'' : Statements .
@@ -197,12 +203,17 @@ mod SEMANTICS is
     eq [POR] :
         (| idle, Sigma, Sp, P |)
         (| idle, Sigma', Sp, P' |)
+        [ L s(N) ]
       =
+        [ L s(N) N ]
         (| idle, Sigma, Sp, P |) .
 
     op schedules : Pool SearchState -> Configuration .
-    eq schedules(empty, (| idle, Sigma, Sp, P' |)) = none .
-    eq schedules((T, P), (| idle, Sigma, Sp, P' |)) =
+    eq schedules(empty, (| idle, Sigma, Sp, P' |)) [ L N ] = [ L ] none .
+    eq schedules((T, P), (| idle, Sigma, Sp, P' |))
+        [ L N ]
+      =
+        [ L N s(N) ]
         (| T, Sigma, Sp, P' \ T |) schedules(P, (| idle, Sigma, Sp, P' |)) [owise] .
 
     rl [Schedule] :
@@ -219,7 +230,9 @@ mod SEMANTICS is
 
     ceq [Cond] :
         (| < I | if (E) { Ss } else { Ss' } ; Ss'' >, Sigma, Sp, P |)
+          [ L N ]
         =
+          [ L N s(N) ]
           (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; Ss'' > ) |)
           (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' ; Ss'' > ) |)
         if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
@@ -227,11 +240,13 @@ mod SEMANTICS is
 
     ceq [While] :
         (| < I | while (E) { Ss } ; Ss' >, Sigma, Sp, P |)
-        =
-          (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; while (E) { Ss } ; Ss' > ) |)
-          (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' > ) |)
-        if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
-           Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
+        [ L N ]
+      =
+        [ L N s(N) ]
+        (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; while (E) { Ss } ; Ss' > ) |)
+        (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' > ) |)
+      if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
+         Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     eq [Bounded-While-Exit] :
         (| < I | while (E)[ 0 ] { Ss } ; Ss' >, Sigma, Sp, P |)
@@ -240,11 +255,13 @@ mod SEMANTICS is
 
     ceq [Bounded-While] :
         (| < I | while (E)[ s B ] { Ss } ; Ss' >, Sigma, Sp, P |)
-        =
-          (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; while (E)[ B ]  { Ss } ; Ss' > ) |)
-          (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' > ) |)
-        if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
-           Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
+        [ L N ]
+      =
+        [ L N s(N) ]
+        (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; while (E)[ B ]  { Ss } ; Ss' > ) |)
+        (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' > ) |)
+      if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
+         Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     eq [Termination] :
         (| idle, Sigma, Sp, (P, < I | skip >) |)

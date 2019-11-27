@@ -1,0 +1,20 @@
+load testmod.maude
+
+rew
+init((< 0 | 'xi := 1 ;
+            while ('xi < 'ys)[2] {
+              'x := 'x * 'xi ;
+              'xi := 'xi + 1
+            } >,
+      < 1 | 'ys := 3 ;
+            'yi := 'ys ;
+            while ('yi < 'n)[2] {
+              'y := 'y * 'yi ;
+              'yi := 'yi + 1
+            } >,
+      < 2 | 'n := 5 ;
+            if ('xi =:= 'ys and 'yi =:= 'n) {
+              'p := 'x * 'y * 'z
+            } else {
+              'p := -1
+            } > )) .

@@ -23,9 +23,11 @@ fmod EXPR is
     subsort Bool < Expr .
 
     op _+_ : Expr Expr -> Expr [ditto] .
+    op _*_ : Expr Expr -> Expr [ditto] .
     op not_ : Expr -> Expr [ditto] .
     op _and_ : Expr Expr -> Expr [ditto] .
     op _=:=_ : Expr Expr -> Expr [prec 25] .
+    op _<_ : Expr Expr -> Expr [ditto] .
 endfm
 
 fmod SYMEXPR is
@@ -43,6 +45,7 @@ fmod SYMEXPR is
     op bool _ : Bool -> SymBool [ctor] .
 
     op _+_ : SymInt SymInt -> SymInt [prec 20 assoc comm] .
+    op _*_ : SymInt SymInt -> SymInt [prec 18 assoc comm] .
     op not_ : SymBool -> SymBool .
     op _and_ : SymBool SymBool -> SymBool [prec 20 assoc comm] .
     op _=:=_ : SymExpr SymExpr -> SymBool [prec 25] .
@@ -104,9 +107,11 @@ fmod SYMPATH is
     op vars : Expr -> Vars .
     eq vars(V) = V .
     eq vars(E1 + E2) = vars(E1), vars(E2) .
+    eq vars(E1 * E2) = vars(E1), vars(E2) .
     eq vars(not(E1)) = vars(E1) .
     eq vars(E1 and E2) = vars(E1), vars(E2) .
     eq vars(E1 =:= E2) = vars(E1), vars(E2) .
+    eq vars(E1 < E2) = vars(E1), vars(E2) .
     eq vars(E1) = empty [owise] .
 
     --- Canonicalization of sympath
@@ -157,9 +162,11 @@ fmod EVAL is
     eq eval(M, B) = bool B .
     eq eval(M, V) = M[V] .
     eq eval(M, E1 + E2) = eval(M, E1) + eval(M, E2) .
+    eq eval(M, E1 * E2) = eval(M, E1) * eval(M, E2) .
     eq eval(M, not(E1)) = not(eval(M, E1)) .
     eq eval(M, E1 and E2) = eval(M, E1) and eval(M, E2) .
     eq eval(M, E1 =:= E2) = eval(M, E1) =:= eval(M, E2) .
+    eq eval(M, E1 < E2) = eval(M, E1) =:= eval(M, E2) .
 endfm
 
 fmod SEARCH-STATE is

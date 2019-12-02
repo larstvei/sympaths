@@ -136,11 +136,11 @@ fmod SYMPATH is
 
     op prec : Event Event -> Bool .
     eq prec(I (Se ~ W ~ R), I' (Se' ~ W' ~ R')) = I < I' .
-
-    op prefix : SymPath SymPath -> Bool .
-    eq prefix(Sp1, Sp1 . Sp2) = true .
-    eq prefix(Sp1, Sp2) = false [owise] .
 endfm
+
+view SymPath from TRIV to SYMPATH is
+    sort Elt to SymPath .
+endv
 
 fmod EVAL is
     including VAR .
@@ -174,23 +174,33 @@ fmod SEARCH-STATE is
     including SYMPATH .
     including SET{Thread} .
 
-    sorts SearchState Pool NePool .
+    sorts SearchState Pool NePool HistItem .
     subsort Set{Thread} < Pool .
     subsort NeSet{Thread} < NePool .
 
     op (|_,_,_,_|) : Thread Substitution SymPath Pool -> SearchState
         [ctor format (n d n s n s n s d n)] .
+    op (||_,_,_,_||) : Thread Substitution SymPath Pool -> SearchState
+        [ctor format (n d n s n s n s d n)] .
+
+    op < prefix:_ por:_ steps:_ states:_ > : Nat Nat Nat Nat -> HistItem [format (d r d og d ob d oy d o n)] .
 endfm
 
+view HistItem from TRIV to SEARCH-STATE is
+    sort Elt to HistItem .
+endv
+
 mod SEMANTICS is
-    including LIST{Nat} .
+    including SET{SymPath} .
+    including LIST{HistItem} .
     including CONFIGURATION .
     including SEARCH-STATE .
 
-    sort Hist .
-    subsort SearchState Hist < Configuration .
+    sorts Hist PathSet .
+    subsort SearchState Hist PathSet < Configuration .
 
-    op [_] : List{Nat} -> Hist .
+    op [_] : List{HistItem} -> Hist .
+    op {_} : Set{SymPath} -> PathSet .
 
     vars Sigma Sigma' : Substitution .
     vars B : Nat .
@@ -198,8 +208,8 @@ mod SEMANTICS is
     vars E : Expr .
     vars Ev1 Ev2 : Event .
     vars Se : SymExpr .
-    vars L : List{Nat} .
-    vars N : Int .
+    vars H : List{HistItem} .
+    vars C1 C2 C3 C4 : Int .
     vars P P' : Pool .
     vars NP NP' : NePool .
     vars Ss Ss' Ss'' : Statements .
@@ -207,71 +217,89 @@ mod SEMANTICS is
     vars I I' : ThreadId .
     vars Sp Sp' : SymPath .
 
-    eq [POR] :
-        (| idle, Sigma, Sp, P |)
-        (| idle, Sigma', Sp, P' |)
-        [ L s(N) ]
-      =
-        [ L s(N) N ]
-        (| idle, Sigma, Sp, P |) .
+    var Paths : Set{SymPath} .
 
     op schedules : Pool SearchState -> Configuration .
-    eq schedules(empty, (| idle, Sigma, Sp, P' |)) [ L N ] = [ L ] none .
+    eq schedules(empty, (| idle, Sigma, Sp, P' |)) = none .
     eq schedules((T, P), (| idle, Sigma, Sp, P' |))
-        [ L N ]
-      =
-        [ L N s(N) ]
-        (| T, Sigma, Sp, P' \ T |) schedules(P, (| idle, Sigma, Sp, P' |)) [owise] .
+      = (|| T, Sigma, Sp, P' \ T ||) schedules(P, (| idle, Sigma, Sp, P' |)) [owise] .
 
     rl [Schedule] :
         (| idle, Sigma, Sp, NP |)
+        [ H < prefix: C1 por: C2 steps: C3 states: C4 > ]
       =>
+        [ H < prefix: C1 por: C2 steps: C3 states: C4 >
+          < prefix: C1 por: C2 steps: s(C3) states: (C4 + sd(| NP |, 1)) > ]
         schedules(NP, (| idle, Sigma, Sp, NP |)) .
 
     ceq [Assignment] :
-        (| < I | V := E ; Ss >, Sigma, Sp, P |)
+        (|| < I | V := E ; Ss >, Sigma, Sp, P ||)
+        { Paths }
       =
+        { Paths, Sp }
         (| idle, insert(V, Se, Sigma), canonical(Sp . Ev1), (P, < I | Ss >) |)
       if Se := eval(Sigma, E) /\
          Ev1 := I (bool true ~ V ~ vars(E)) .
 
     ceq [Cond] :
-        (| < I | if (E) { Ss } else { Ss' } ; Ss'' >, Sigma, Sp, P |)
-          [ L N ]
+        (|| < I | if (E) { Ss } else { Ss' } ; Ss'' >, Sigma, Sp, P ||)
+          [ H < prefix: C1 por: C2 steps: C3 states: C4 > ]
+          { Paths }
         =
-          [ L N s(N) ]
+          { Paths, Sp }
+          [ H < prefix: C1 por: C2 steps: C3 states: s(C4) > ]
           (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; Ss'' > ) |)
           (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' ; Ss'' > ) |)
         if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
            Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     ceq [While] :
-        (| < I | while (E) { Ss } ; Ss' >, Sigma, Sp, P |)
-        [ L N ]
+        (|| < I | while (E) { Ss } ; Ss' >, Sigma, Sp, P ||)
+        [ H < prefix: C1 por: C2 steps: C3 states: C4 > ]
+        { Paths }
       =
-        [ L N s(N) ]
+        { Paths, Sp }
+        [ H < prefix: C1 por: C2 steps: C3 states: s(C4) > ]
         (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; while (E) { Ss } ; Ss' > ) |)
         (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' > ) |)
       if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
          Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     eq [Bounded-While-Exit] :
-        (| < I | while (E)[ 0 ] { Ss } ; Ss' >, Sigma, Sp, P |)
+        (|| < I | while (E)[ 0 ] { Ss } ; Ss' >, Sigma, Sp, P ||)
       =
         (| idle , Sigma, Sp, (< I | Ss' >, P) |) .
 
     ceq [Bounded-While] :
-        (| < I | while (E)[ s B ] { Ss } ; Ss' >, Sigma, Sp, P |)
-        [ L N ]
+        (|| < I | while (E)[ s B ] { Ss } ; Ss' >, Sigma, Sp, P ||)
+        [ H < prefix: C1 por: C2 steps: C3 states: C4 > ]
+        { Paths }
       =
-        [ L N s(N) ]
+        { Paths, Sp }
+        [ H < prefix: C1 por: C2 steps: C3 states: s(C4) > ]
         (| idle, Sigma, canonical(Sp . Ev1), (P, < I | Ss ; while (E)[ B ]  { Ss } ; Ss' > ) |)
         (| idle, Sigma, canonical(Sp . Ev2), (P, < I | Ss' > ) |)
       if Ev1 := I (eval(Sigma, E) ~ empty ~ vars(E)) /\
          Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     eq [Termination] :
-        (| idle, Sigma, Sp, (P, < I | skip >) |)
+        (|| idle, Sigma, Sp, (P, < I | skip >) ||)
       =
         (| idle, Sigma, Sp, P |)  .
+
+    eq [POR-PREFIX] :
+        (| idle, Sigma, Sp, P |)
+        [ H < prefix: C1 por: C2 steps: C3 states: s(C4) > ]
+        { Paths, Sp }
+      =
+        { Paths, Sp }
+        [ H < prefix: s(C1) por: C2 steps: C3 states: C4 > ] .
+
+    eq [POR] :
+        (| idle, Sigma, Sp, P |)
+        (| idle, Sigma, Sp, P |)
+        [ H < prefix: C1 por: C2 steps: C3 states: s(C4) > ]
+      =
+        (| idle, Sigma, Sp, P |)
+        [ H < prefix: C1 por: s(C2) steps: C3 states: C4 > ] .
 endm

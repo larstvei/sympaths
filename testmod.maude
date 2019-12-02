@@ -12,7 +12,6 @@ mod TESTING is
     vars E : Expr .
     vars Ev1 Ev2 : Event .
     vars Se : SymExpr .
-    vars L : List{Nat} .
     vars N : Int .
     vars P P' : Pool .
     vars NP NP' : NePool .
@@ -49,5 +48,5 @@ mod TESTING is
     eq init(P) = init(P, sigma(varsof(P))) .
 
     op init : Pool Substitution -> Configuration .
-    eq init(P, Sigma) = [ 1 ] (| idle, Sigma, epsilon, P |) .
+    eq init(P, Sigma) = [ < prefix: 0 por: 0 steps: 0 states: 1 > ] (| idle, Sigma, epsilon, P |) { empty } .
 endm

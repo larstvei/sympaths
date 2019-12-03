@@ -283,7 +283,7 @@ mod SEMANTICS is
          Ev2 := I (eval(Sigma, not(E)) ~ empty ~ vars(E)) .
 
     eq [Termination] :
-        (|| idle, Sigma, Sp, (P, < I | skip >) ||)
+        (| idle, Sigma, Sp, (P, < I | skip >) |)
       =
         (| idle, Sigma, Sp, P |)  .
 

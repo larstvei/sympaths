@@ -69,19 +69,19 @@ mod DYNAMIC-PROVER is
       =>
         |- (Gamma, Sp ==> Sigma Psy) .
 
-    --- Two rules for POR, becuase we the reduced term does not match with a
-    --- ProofObligation.
-    ceq [DL-POR] :
-        (Gamma, Sp ==> Sigma [ idle, P ] Psy)
-        (Gamma, Sp' ==> Sigma [ idle, P ] Psy)
-      =
-        Gamma, Sp ==> Sigma [ idle, P ] Psy
-      if prefix(canonical(Sp'), canonical(Sp)) .
+    --- --- Two rules for POR, becuase we the reduced term does not match with a
+    --- --- ProofObligation.
+    --- ceq [DL-POR] :
+    ---     (Gamma, Sp ==> Sigma [ idle, P ] Psy)
+    ---     (Gamma, Sp' ==> Sigma [ idle, P ] Psy)
+    ---   =
+    ---     Gamma, Sp ==> Sigma [ idle, P ] Psy
+    ---   if prefix(canonical(Sp'), canonical(Sp)) .
 
-    ceq [DL-POR] :
-        |- (Gamma, Sp ==> Sigma Psy)
-        (Gamma, Sp' ==> Sigma [ idle, P ] Psy)
-      =
-        Gamma, Sp ==> Sigma [ idle, P ] Psy
-      if prefix(canonical(Sp'), canonical(Sp)) .
+    --- ceq [DL-POR] :
+    ---     |- (Gamma, Sp ==> Sigma Psy)
+    ---     (Gamma, Sp' ==> Sigma [ idle, P ] Psy)
+    ---   =
+    ---     Gamma, Sp ==> Sigma [ idle, P ] Psy
+    ---   if prefix(canonical(Sp'), canonical(Sp)) .
 endm

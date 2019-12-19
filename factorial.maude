@@ -1,15 +1,15 @@
 load testmod.maude
 
 rew
-init((< 0 | while ('xi < 'ys)[1] {
-              'x := 'x * 'xi ;
-              'xi := 'xi + 1
+init((< 0 | while ('i < 'm)[2] {
+              'x := 'x * 'i ;
+              'i := 'i + 1
             } >,
-      < 1 | while ('yi < 'n)[1] {
-              'y := 'y * 'yi ;
-              'yi := 'yi + 1
+      < 1 | while ('j < 'n)[1] {
+              'y := 'y * 'j ;
+              'j := 'j + 1
             } >,
-      < 2 | if ('xi =:= 'ys and 'yi =:= 'n) {
+      < 2 | if ('i =:= 'm and 'j =:= 'n) {
               'p := 'x * 'y
             } else {
               'p := -1

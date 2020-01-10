@@ -1,7 +1,7 @@
 load testmod.maude
 
 rew
-init((< 0 | while ('i < 'm)[2] {
+init((< 0 | while ('i < 'm)[1] {
               'x := 'x * 'i ;
               'i := 'i + 1
             } >,

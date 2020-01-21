@@ -8,15 +8,6 @@ rew init((< 0 | while ('y =:= 'x)[2] { 'y := 'y + 1 } >,
           < 1 | 'z := 'x >,
           < 2 | 'x := 2 > )) .
 
---- DL
-
-rew
-Gamma, epsilon ==>
-('x |-> x(0), 'y |-> x(1), 'z |-> x(2))
-[ idle, (< 0 | 'y := 'x >, < 1 | 'z := 'x >, < 2 | 'x := 2 > ) ]
-Psy
-.
-
 --- Frank test 1
 rew init((< 0 | 'x := 0 >,
           < 1 | 'y := 0 >,

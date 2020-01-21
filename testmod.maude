@@ -1,9 +1,7 @@
 load sympaths.maude
-load dynamic.maude
 
 mod TESTING is
     including SEMANTICS .
-    including DYNAMIC-PROVER .
 
     vars Sigma Sigma' : Substitution .
     vars B : Nat .
